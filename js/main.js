@@ -109,14 +109,13 @@ function makeTodo(todoObject) {
   container.append(textContainer);
   container.setAttribute('id', `todo-${id}`);
 
-  // Check if the todo matches the search criteria
   const searchInput = document.getElementById('searchBookTitle').value.toLowerCase();
   const isMatch = judul.toLowerCase().includes(searchInput);
 
   if (!isMatch) {
-    container.style.display = 'none'; // hide the element if it doesn't match
+    container.style.display = 'none';
   } else {
-    container.style.display = 'block'; // show the element if it matches
+    container.style.display = 'block'; 
   }
 
   if (isCompleted) {
@@ -154,19 +153,48 @@ function makeTodo(todoObject) {
 
 
 
+// function addTodo() {
+//   const textJudul = document.getElementById('judul').value;
+//   const textPenulis = document.getElementById('penulis').value;
+//   const textTahun = document.getElementById('tahun').value;
+
+
+//   const generatedID = generateId();
+//   const todoObject = generateTodoObject(generatedID, textJudul, textPenulis, textTahun, false);
+//   todos.push(todoObject);
+
+//   document.dispatchEvent(new Event(RENDER_EVENT));
+//   saveData();
+// }
+
 function addTodo() {
   const textJudul = document.getElementById('judul').value;
   const textPenulis = document.getElementById('penulis').value;
   const textTahun = document.getElementById('tahun').value;
-
+  const isCompleteCheckbox = document.getElementById('inputBookIsComplete');
 
   const generatedID = generateId();
-  const todoObject = generateTodoObject(generatedID, textJudul, textPenulis, textTahun, false);
-  todos.push(todoObject);
+  const isCompleted = isCompleteCheckbox.checked;
 
-  document.dispatchEvent(new Event(RENDER_EVENT));
+  const todoObject = generateTodoObject(generatedID, textJudul, textPenulis, textTahun, isCompleted);
+  
+  if (isCompleted) {
+    // Jika checkbox "Selesai dibaca" dicentang, langsung masukkan ke dalam container "sudah dibaca"
+    todos.push(todoObject);
+    document.dispatchEvent(new Event(RENDER_EVENT));
+  } else {
+    // Jika checkbox tidak dicentang, hanya tampilkan jika sesuai kriteria pencarian
+    const searchInput = document.getElementById('searchBookTitle').value.toLowerCase();
+    if (textJudul.toLowerCase().includes(searchInput)) {
+      todos.push(todoObject);
+      document.dispatchEvent(new Event(RENDER_EVENT));
+    }
+  }
+
   saveData();
 }
+
+
 
 function addTaskToCompleted(todoId /* HTMLELement */) {
   const todoTarget = findTodo(todoId);
