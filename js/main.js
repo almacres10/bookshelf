@@ -88,9 +88,8 @@ function loadDataFromStorage() {
   document.dispatchEvent(new Event(RENDER_EVENT));
 }
 
-
 function makeTodo(todoObject) {
-  const {id, judul, penulis, tahun, isCompleted} = todoObject;
+  const { id, judul, penulis, tahun, isCompleted } = todoObject;
 
   const textTitle = document.createElement('h2');
   textTitle.innerText = judul;
@@ -106,9 +105,19 @@ function makeTodo(todoObject) {
   textContainer.append(textTitle, textPenulis, textTahun);
 
   const container = document.createElement('div');
-  container.classList.add('item', 'shadow')
+  container.classList.add('item', 'shadow');
   container.append(textContainer);
   container.setAttribute('id', `todo-${id}`);
+
+  // Check if the todo matches the search criteria
+  const searchInput = document.getElementById('searchBookTitle').value.toLowerCase();
+  const isMatch = judul.toLowerCase().includes(searchInput);
+
+  if (!isMatch) {
+    container.style.display = 'none'; // hide the element if it doesn't match
+  } else {
+    container.style.display = 'block'; // show the element if it matches
+  }
 
   if (isCompleted) {
     const undoButton = document.createElement('button');
@@ -125,7 +134,6 @@ function makeTodo(todoObject) {
 
     container.append(undoButton, trashButton);
   } else {
-
     const checkButton = document.createElement('button');
     checkButton.classList.add('check-button');
     checkButton.addEventListener('click', function () {
@@ -138,12 +146,13 @@ function makeTodo(todoObject) {
       removeTaskFromCompleted(id);
     });
 
-
     container.append(checkButton, trashButton);
   }
 
   return container;
 }
+
+
 
 function addTodo() {
   const textJudul = document.getElementById('judul').value;
@@ -224,3 +233,46 @@ document.addEventListener(RENDER_EVENT, function () {
     }
   }
 })
+
+function searchBooksByTitle(title) {
+  const serializedData /* string */ = localStorage.getItem(STORAGE_KEY);
+  let data = JSON.parse(serializedData);
+
+  if (Array.isArray(data) && data.length > 0) {
+    const searchResults = data.filter(book =>
+      book &&
+      book.judul &&
+      typeof book.judul === 'string' &&
+      book.judul.toLowerCase().includes(title.toLowerCase())
+    );
+    return searchResults;
+  }
+
+  return [];
+}
+
+document.getElementById('searchBook').addEventListener('submit', function(event){
+  event.preventDefault();
+  const searchInput = document.getElementById('searchBookTitle').value.toLowerCase();
+  const searchResults = searchBooksByTitle(searchInput);
+
+  renderTodos(searchResults);
+});
+
+function renderTodos(todosToRender) {
+  const uncompletedTODOList = document.getElementById('todos');
+  const listCompleted = document.getElementById('completed-todos');
+
+  // Clearing list items
+  uncompletedTODOList.innerHTML = '';
+  listCompleted.innerHTML = '';
+
+  for (const todoItem of todosToRender) {
+    const todoElement = makeTodo(todoItem);
+    if (todoItem.isCompleted) {
+      listCompleted.append(todoElement);
+    } else {
+      uncompletedTODOList.append(todoElement);
+    }
+  }
+}
