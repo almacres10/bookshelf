@@ -17,13 +17,13 @@ function generateId() {
   return +new Date();
 }
 
-function generateTodoObject(id, judul, penulis, tahun, isCompleted) {
+function generateTodoObject(id, title, author, year, isComplete) {
   return {
     id,
-    judul,
-    penulis,
-    tahun,
-    isCompleted
+    title,
+    author,
+    year,
+    isComplete
   }
 }
 
@@ -89,16 +89,16 @@ function loadDataFromStorage() {
 }
 
 function makeTodo(todoObject) {
-  const { id, judul, penulis, tahun, isCompleted } = todoObject;
+  const { id, title, author, year, isCompleted } = todoObject;
 
   const textTitle = document.createElement('h2');
-  textTitle.innerText = judul;
+  textTitle.innerText = title;
 
   const textPenulis = document.createElement('p');
-  textPenulis.innerText = penulis;
+  textPenulis.innerText = author;
 
   const textTahun = document.createElement('p');
-  textTahun.innerText = tahun;
+  textTahun.innerText = year;
 
   const textContainer = document.createElement('div');
   textContainer.classList.add('inner');
@@ -110,7 +110,7 @@ function makeTodo(todoObject) {
   container.setAttribute('id', `todo-${id}`);
 
   const searchInput = document.getElementById('searchBookTitle').value.toLowerCase();
-  const isMatch = judul.toLowerCase().includes(searchInput);
+  const isMatch = title.toLowerCase().includes(searchInput);
 
   if (!isMatch) {
     container.style.display = 'none';
@@ -168,9 +168,9 @@ function makeTodo(todoObject) {
 // }
 
 function addTodo() {
-  const textJudul = document.getElementById('judul').value;
-  const textPenulis = document.getElementById('penulis').value;
-  const textTahun = document.getElementById('tahun').value;
+  const textJudul = document.getElementById('title').value;
+  const textPenulis = document.getElementById('author').value;
+  const textTahun = parseInt(document.getElementById('year').value, 10);
   const isCompleteCheckbox = document.getElementById('inputBookIsComplete');
 
   const generatedID = generateId();
@@ -269,9 +269,9 @@ function searchBooksByTitle(title) {
   if (Array.isArray(data) && data.length > 0) {
     const searchResults = data.filter(book =>
       book &&
-      book.judul &&
-      typeof book.judul === 'string' &&
-      book.judul.toLowerCase().includes(title.toLowerCase())
+      book.title &&
+      typeof book.title === 'string' &&
+      book.title.toLowerCase().includes(title.toLowerCase())
     );
     return searchResults;
   }
